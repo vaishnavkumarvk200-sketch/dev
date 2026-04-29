@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mini Chat</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #111;
+      color: white;
+    }
+
+    #login {
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    #chatUI {
+      display: none;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    #header {
+      background: #25D366;
+      padding: 15px;
+      text-align: center;
+    }
+
+    #chat {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .msg {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 10px;
+      max-width: 70%;
+    }
+
+    .me {
+      background: #25D366;
+      align-self: flex-end;
+      color: black;
+    }
+
+    .other {
+      background: #333;
+      align-self: flex-start;
+    }
+
+    #inputArea {
+      display: flex;
+      padding: 10px;
+      background: #222;
+    }
+
+    #inputArea input {
+      flex: 1;
+      padding: 10px;
+    }
+
+    #inputArea button {
+      background: #25D366;
+      border: none;
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="login">
+  <h2>Mini WhatsApp</h2>
+  <input id="name" placeholder="Enter name">
+  <button onclick="start()">Start</button>
+</div>
+
+<div id="chatUI">
+  <div id="header">Mini Chat</div>
+
+  <div id="chat"></div>
+
+  <div id="inputArea">
+    <input id="message" placeholder="Type message">
+    <button onclick="send()">Send</button>
+  </div>
+</div>
+
+<script>
+let username = "";
+
+function start() {
+  username = document.getElementById("name").value;
+
+  if (!username) return;
+
+  document.getElementById("login").style.display = "none";
+  document.getElementById("chatUI").style.display = "flex";
+
+  loadMessages();
+}
+
+function send() {
+  const text = document.getElementById("message").value;
+  if (!text) return;
+
+  const msg = {
+    user: username,
+    text: text,
+    time: new Date().toLocaleTimeString()
+  };
+
+  let messages = JSON.parse(localStorage.getItem("chat")) || [];
+  messages.push(msg);
+
+  localStorage.setItem("chat", JSON.stringify(messages));
+
+  document.getElementById("message").value = "";
+  loadMessages();
+}
+
+function loadMessages() {
+  const chat = document.getElementById("chat");
+  chat.innerHTML = "";
+
+  let messages = JSON.parse(localStorage.getItem("chat")) || [];
+
+  messages.forEach(m => {
+    const div = document.createElement("div");
+    div.className = "msg " + (m.user === username ? "me" : "other");
+
+    div.innerHTML = m.text + "<br><small>" + m.time + "</small>";
+
+    chat.appendChild(div);
+  });
+
+  chat.scrollTop = chat.scrollHeight;
+}
+
+window.addEventListener("storage", loadMessages);
+</script>
+
+</body>
+</html>
